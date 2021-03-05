@@ -1,22 +1,18 @@
 import logging
+from datetime import datetime, timedelta
+from typing import Optional
+
 import yaml
-from jose import JWTError, jwt
 from airtable import airtable
-from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from typing import Optional
-from datetime import datetime, timedelta
-from .lib_cfg import (
-    config,
-)
-from auth_api.models import (
-    TokenData,
-    User,
-)
-from .deps import (
-    logger
-)
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+from auth_api.models import TokenData, User
+
+from .deps import logger
+from .lib_cfg import config
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=config.key('token'), auto_error=False)
 

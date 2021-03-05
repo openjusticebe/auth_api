@@ -2,30 +2,22 @@
 import argparse
 import logging
 import os
-import toml
 from datetime import datetime
 
-from fastapi import FastAPI
 import asyncpg
 import pytz
+import toml
 import uvicorn
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
-from .routers import (
-    users,
-)
-
-from .deps import (
-    logger,
-)
-
 import auth_api.deps as deps
-
-from .lib_cfg import (config)
-
 import auth_api.lib_misc as lm
 
+from .deps import logger
+from .lib_cfg import config
+from .routers import users
 
 # ################################################## SETUP AND ARGUMENT PARSING
 # #############################################################################
