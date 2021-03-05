@@ -43,8 +43,7 @@ class ConfigClass:
         },
         'log_level': 'info',
         'salt': os.getenv('SALT', 'OpenJusticePirates'),
-        'token': os.getenv('token', 'SomeToken'),
-        'oj_env': os.getenv('OJ_ENV', 'development'),
+        'token': os.getenv('TOKEN', 'SomeToken'),
         'keys': {
             'development': os.getenv('DEV_KEY', '5aLqJFte6G7IsuDNTOhjO8ICcKme62sRs0tX2XHQyzs='),
             'staging': os.getenv('STAGING_KEY', '5aLqJFte6G7IsuDNTOhjO8ICcKme62sRs0tX2XHQyzs='),
