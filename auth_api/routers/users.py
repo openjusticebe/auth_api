@@ -14,6 +14,7 @@ from ..auth import (
 )
 from ..deps import (
     get_db,
+    logger,
     oj_decode,
 )
 
@@ -51,7 +52,7 @@ async def read_users(
 
     sql = """
     SELECT
-        id_internal, name, email, email_valid, profession, access_prod, access_test, access_staging, access_dev
+        id_internal, name, username, email, email_valid, profession, access_prod, access_test, access_staging, access_dev
     FROM
         users
     ORDER BY
@@ -72,7 +73,7 @@ async def read_user_me(
     # FIXME: Use userid instead of something else
     sql = """
     SELECT
-        id_internal, name, email, email_valid, profession, access_prod, access_test, access_staging, access_dev
+        id_internal, name, username, email, email_valid, profession, access_prod, access_test, access_staging, access_dev
     FROM
         users
     WHERE
@@ -80,8 +81,14 @@ async def read_user_me(
     ORDER BY
         date_created DESC
     """
-    res = await db.fetch(sql, current_user.email)
-    return [dict(r) for r in res]
+
+    res = await db.fetchrow(sql, current_user.email)
+    return User(
+        email=res['email'],
+        valid=res['email_valid'],
+        username=res['username'],
+        admin=True,
+    )
 
 
 @router.get("/u/{username}", tags=["users"])
