@@ -17,7 +17,10 @@ import auth_api.lib_misc as lm
 
 from .deps import logger
 from .lib_cfg import config
-from .routers import users
+from .routers import (
+    users,
+    token,
+)
 
 # ################################################## SETUP AND ARGUMENT PARSING
 # #############################################################################
@@ -42,6 +45,7 @@ app = FastAPI(root_path=config.key('proxy_prefix'), openapi_tags=tags_metadata)
 
 # Include sub routes
 app.include_router(users.router)
+app.include_router(token.router)
 
 # Server config
 app.add_middleware(

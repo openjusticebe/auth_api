@@ -19,6 +19,7 @@ passlib = {extras = ["argon2"], version = "^1.7.4"}
 python-jose = "^3.2.0"
 python-multipart = "^0.0.5"
 cryptography = "^3.4.6"
+psycopg2-binary = "^2.8.6"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.7.0"
