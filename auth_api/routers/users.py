@@ -17,6 +17,7 @@ from ..deps import (
     logger,
     oj_decode,
 )
+from auth_api.repositories.users import get_user_repo
 
 router = APIRouter()
 
@@ -65,24 +66,13 @@ async def read_users(
 
 @router.get("/u/me", response_model=User, tags=["users"])
 async def read_user_me(
-        db=Depends(get_db),
+        repo=Depends(get_user_repo),
         current_user: User = Depends(get_current_active_user)):
     """
     Read data from connected user
     """
-    # FIXME: Use userid instead of something else
-    sql = """
-    SELECT
-        id_internal, name, username, email, email_valid, profession, access_prod, access_test, access_staging, access_dev
-    FROM
-        users
-    WHERE
-        email = $1
-    ORDER BY
-        date_created DESC
-    """
+    res = await repo.getByMail(current_user.email)
 
-    res = await db.fetchrow(sql, current_user.email)
     return User(
         email=res['email'],
         valid=res['email_valid'],
