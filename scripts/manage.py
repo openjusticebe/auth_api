@@ -42,7 +42,7 @@ def pg2dict(res):
         'job': res.get('profession'),
         'description': res.get('description'),
         'key': res.get('ukey'),
-        'passw': res.get('pass'),
+        'passw': res.get('password'),
     }
 
 
@@ -113,7 +113,7 @@ def migrate(ctx):
                 name,
                 username,
                 email,
-                pass,
+                password,
                 ukey,
                 profession,
                 description
