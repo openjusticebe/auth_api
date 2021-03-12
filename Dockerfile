@@ -23,4 +23,5 @@ RUN poetry config virtualenvs.create false && \
 
 
 EXPOSE 80
-ENTRYPOINT ["poetry", "run", "api"]
+CMD ["bash"]
+#ENTRYPOINT ["poetry", "run", "api"]
