@@ -1,50 +1,25 @@
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException, status
-from datetime import timedelta
+from fastapi import APIRouter, Depends
 from auth_api.lib_cfg import config
 from auth_api.models import (
-    Token,
     User,
     DecodeModel,
     ByKeyModel,
 )
-from auth_api.auth import (
-    auth_user,
-    create_access_token,
+from ..auth import (
     get_current_active_user,
     decode_token,
     get_user_by_key,
+    credentials_exception,
+    get_current_active_user_opt,
 )
 from ..deps import (
     get_db,
+    logger,
     oj_decode,
 )
+from auth_api.repositories.users import get_user_repo
 
 router = APIRouter()
-
-
-@router.post("/token", response_model=Token, tags=["authentication"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    """
-    Submit username/password form to this endpoint to obtain auth token
-
-    The obtained token must be used as bearer auth in the authentication headers.
-    """
-    # FIXME: Some other auth provider then airtable would be nice
-    # FIXME: Add support for scopes (like admin, moderatore, ...)
-    # FIXME: Add password hashing support
-    user = auth_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Bad username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=config.key(['auth', 'expiration_minutes']))
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
 
 
 # @router.get("/users/me/", response_model=User)
@@ -57,26 +32,71 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @router.post("/u/by/token", response_model=User, tags=["authentication"])
-async def decode(query: DecodeModel, db=Depends(get_db)):
-    return decode_token(oj_decode(query.token, query.env))
+async def decode(
+        query: DecodeModel,
+        repo=Depends(get_user_repo)):
+    tokdata = decode_token(oj_decode(query.token, query.env))
+    res = await repo.getByMail(tokdata.username)
+
+    return User(
+        email=res['email'],
+        valid=True,
+        username=res['username'],
+        admin=True,
+    )
 
 
 @router.post("/u/by/key", response_model=User, tags=["authentication"])
-async def read_user_by_key(query: ByKeyModel, db=Depends(get_db)):
-    return get_user_by_key(oj_decode(query.key, query.env))
+async def read_user_by_key(
+        query: ByKeyModel,
+        repo=Depends(get_user_repo)):
+    res = await repo.getByKey(oj_decode(query.key, query.env))
+    return User(
+        email=res['email'],
+        valid=True,
+        username=res['username'],
+        admin=True,
+    )
 
 
 @router.get("/u/", tags=["users"])
-async def read_users():
-    return []
+async def read_users(
+        db=Depends(get_db),
+        current_user: User = Depends(get_current_active_user_opt)):
+    """
+    List all users
+    """
+    if not current_user.admin:
+        raise credentials_exception
+
+    sql = """
+    SELECT
+        id_internal, name, username, email, email_valid, profession, access_prod, access_test, access_staging, access_dev
+    FROM
+        users
+    ORDER BY
+        date_created DESC
+    """
+
+    res = await db.fetch(sql)
+    return [dict(r) for r in res]
 
 
 @router.get("/u/me", response_model=User, tags=["users"])
-async def read_user_me(current_user: User = Depends(get_current_active_user)):
+async def read_user_me(
+        repo=Depends(get_user_repo),
+        current_user: User = Depends(get_current_active_user)):
     """
     Read data from connected user
     """
-    return current_user
+    res = await repo.getByMail(current_user.email)
+
+    return User(
+        email=res['email'],
+        valid=res['email_valid'],
+        username=res['username'],
+        admin=True,
+    )
 
 
 @router.get("/u/{username}", tags=["users"])
