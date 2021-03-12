@@ -19,6 +19,18 @@ GET_USER_BY_MAIL = """
         date_created DESC
 """
 
+GET_USER_BY_KEY = """
+    SELECT
+        id_internal, name, username, email, email_valid, profession,
+        access_prod, access_test, access_staging, access_dev
+    FROM
+        users
+    WHERE
+        ukey = $1
+    ORDER BY
+        date_created DESC
+"""
+
 REGISTER_NEW_USER = """
     INSERT INTO users (userid, username, email, profession, description, ukey, password, salt)
     VALUES ($s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -39,6 +51,10 @@ class UserRepo:
 
     async def getByMail(self, email):
         res = await self._db.fetchrow(GET_USER_BY_MAIL, email)
+        return res
+
+    async def getByKey(self, ukey):
+        res = await self._db.fetchrow(GET_USER_BY_KEY, ukey)
         return res
 
     async def registerNewUser(self, *, user: UserCreate):

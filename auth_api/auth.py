@@ -13,6 +13,7 @@ from auth_api.models import TokenData, User
 
 from .deps import logger
 from .lib_cfg import config
+from auth_api.repositories.users import get_user_repo
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=config.key('token'), auto_error=False)
 
@@ -103,10 +104,21 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_current_user(token: Optional[str] = Depends(oauth2_scheme)):
+async def get_current_user(
+        token: Optional[str] = Depends(oauth2_scheme),
+        repo=Depends(get_user_repo)):
     if not token:
         return False
-    return decode_token(token)
+
+    tokdata = decode_token(token)
+    res = await repo.getByMail(tokdata.username)
+
+    return User(
+        email=res['email'],
+        valid=True,
+        username=res['username'],
+        admin=True,
+    )
 
 
 def decode_token(token):
@@ -125,14 +137,16 @@ def decode_token(token):
     except JWTError:
         logger.warning('JWTError')
         raise credentials_exception
-    user = get_user(username=token_data.username)
-    if user is None:
-        logger.warning('No User Found')
-        raise credentials_exception
-    return user
+    return token_data
+    # user = get_user(username=token_data.username)
+    # if user is None:
+    #     logger.warning('No User Found')
+    #     raise credentials_exception
+    # return user
 
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    print(current_user)
     if not current_user:
         raise HTTPException(status_code=400, detail="Could not identify user")
     if not current_user.valid:

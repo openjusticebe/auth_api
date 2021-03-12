@@ -32,13 +32,31 @@ router = APIRouter()
 
 
 @router.post("/u/by/token", response_model=User, tags=["authentication"])
-async def decode(query: DecodeModel, db=Depends(get_db)):
-    return decode_token(oj_decode(query.token, query.env))
+async def decode(
+        query: DecodeModel,
+        repo=Depends(get_user_repo)):
+    tokdata = decode_token(oj_decode(query.token, query.env))
+    res = await repo.getByMail(tokdata.username)
+
+    return User(
+        email=res['email'],
+        valid=True,
+        username=res['username'],
+        admin=True,
+    )
 
 
 @router.post("/u/by/key", response_model=User, tags=["authentication"])
-async def read_user_by_key(query: ByKeyModel, db=Depends(get_db)):
-    return get_user_by_key(oj_decode(query.key, query.env))
+async def read_user_by_key(
+        query: ByKeyModel,
+        repo=Depends(get_user_repo)):
+    res = await repo.getByKey(oj_decode(query.key, query.env))
+    return User(
+        email=res['email'],
+        valid=True,
+        username=res['username'],
+        admin=True,
+    )
 
 
 @router.get("/u/", tags=["users"])
