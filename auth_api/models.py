@@ -35,12 +35,34 @@ class UserInDB(User):
     hashed_password: str
 
 
-class UserCreate(BaseModel):
-    userid: str
-    username: str
+class SubscribeModel(BaseModel):
+    fname: str
+    lname: str
     email: str
+    password: str
+    interest: str
     profession: str
     description: str
-    ukey: str
+
+# class UserCreate(BaseModel):
+#     userid: str
+#     username: str
+#     email: str
+#     profession: str
+#     description: str
+#     ukey: str
+#     password: str
+#     salt: str
+
+
+class UserCreate(BaseModel):
+    fname: str
+    lname: str
+    email: str
     password: str
+    interest: str
+    profession: str
+    description: str
+    username: str
+    ukey: str
     salt: str
