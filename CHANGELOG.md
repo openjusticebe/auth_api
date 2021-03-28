@@ -14,6 +14,7 @@ and to the [CHANGELOG recommendations](http://keepachangelog.com/).
 - added new account mail template
 - tuned password security
 - added user records fields
+- removed airtable dependency
 
 ### [2] - (2020-03-12)
 - refactoring user repository
