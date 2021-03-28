@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
+import uuid
 
 from pydantic import BaseModel, Field, Json, PositiveInt
 
@@ -56,6 +57,7 @@ class SubscribeModel(BaseModel):
 
 
 class UserCreate(BaseModel):
+    userid: uuid.UUID
     fname: str
     lname: str
     email: str

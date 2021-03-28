@@ -32,9 +32,9 @@ GET_USER_BY_KEY = """
 """
 
 REGISTER_NEW_USER = """
-    INSERT INTO users (userid, username, email, profession, description, ukey, password, salt)
-    VALUES ($s, %s, %s, %s, %s, %s, %s, %s, %s)
-    RETURNING userid, username, email,
+    INSERT INTO users (userid, username, email, profession, description, ukey, pass, salt, fname, lname, interest)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    RETURNING userid, username, email
 """
 
 
@@ -59,7 +59,7 @@ class UserRepo:
 
     async def registerNewUser(self, *, user: UserCreate):
         logger.debug("Creating new user record for %s - %s", user.userid, user.username)
-        res = await self._db.fetchrow(REGISTER_NEW_USER, (
+        res = await self._db.fetchrow(REGISTER_NEW_USER,
             user.userid,
             user.username,
             user.email,
@@ -67,7 +67,10 @@ class UserRepo:
             user.description,
             user.ukey,
             user.password,
-            user.salt
-        ))
+            user.salt,
+            user.fname,
+            user.lname,
+            user.interest)
+        logger.info("Created new user %s (%s)", user.username, user.userid)
         return res
 
