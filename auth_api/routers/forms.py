@@ -17,6 +17,8 @@ from ..deps import (
     logger,
     oj_decode,
 )
+from ..lib_mail import notify
+
 from auth_api.repositories.users import get_user_repo
 
 router = APIRouter()
@@ -56,6 +58,8 @@ async def new_user(
     print(UC)
 
     res = await repo.registerNewUser(user=UC)
+
+    await notify(email, 'new_account', {'fname': fname, 'lname': lname})
 
     return {
         'username': res['username'],

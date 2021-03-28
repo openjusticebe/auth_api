@@ -112,6 +112,7 @@ def main():
             reload=True,
             **config.key('server')
         )
+
     uvicorn.run(
         app,
         **config.key('server')

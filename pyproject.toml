@@ -20,6 +20,7 @@ python-jose = "^3.2.0"
 python-multipart = "^0.0.5"
 cryptography = "^3.4.6"
 psycopg2-binary = "^2.8.6"
+Jinja2 = "^2.11.3"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.7.0"

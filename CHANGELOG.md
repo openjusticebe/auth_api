@@ -7,9 +7,13 @@ This project adheres to [Semantic Versioning](http://semver.org/)
 and to the [CHANGELOG recommendations](http://keepachangelog.com/).
 ## Alpha Development
 
-### [3] - (2020-03-12)
+### [3] - (2020-03-28)
 - full postgres login
 - account creation endpoint
+- added mail notification
+- added new account mail template
+- tuned password security
+- added user records fields
 
 ### [2] - (2020-03-12)
 - refactoring user repository
