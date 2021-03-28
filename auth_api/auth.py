@@ -20,7 +20,7 @@ from auth_api.repositories.users import get_user_repo
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=config.key('token'), auto_error=False)
 
 
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto", argon2__min_rounds=256)
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto", argon2__min_rounds=6)
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -37,57 +37,28 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def auth_user(username: str, password: str):
-    at = airtable.Airtable(config.key(['airtable', 'base_id']), config.key(['airtable', 'api_key']))
-    res = at.get('Test Users', filter_by_formula="FIND('%s', {Email})=1" % username)
+async def auth_user(username: str, password: str, repo):
     try:
-        rec = res['records'][0]['fields']
-        assert verify_password(password, rec['pass'])
-        logger.info("Authentified user %s", rec['Name'])
+        res = await repo.getByMail(username)
+        assert verify_password(password, res['pass'], salt=res['salt'])
+        logger.info("Authentified user %s (%s)", res['username'], res['userid'])
         udict = {
-            'email': rec['Email'],
-            'valid': rec['Valid'],
-            'username': rec['Name'],
+            'email': res['email'],
+            'valid': True,
+            'username': res['username'],
             'admin': True,
         }
-        logger.debug(yaml.dump(rec, indent=2))
         return User(**udict)
-    except (KeyError, AssertionError):
-        logger.info('Error occured')
-        logger.debug(res)
+    except KeyError as e:
+        logger.exception(e)
+        logger.info('Login error')
         return None
-
-
-def get_user(username: str):
-    at = airtable.Airtable(config.key(['airtable', 'base_id']), config.key(['airtable', 'api_key']))
-    logger.info('Checking for %s in db', username)
-    res = at.get('Test Users', filter_by_formula="FIND('%s', {Email})=1" % username)
-    try:
-        rec = res['records'][0]['fields']
-        udict = {
-            'email': rec['Email'],
-            'valid': rec['Valid'],
-            'username': rec['Name'],
-            'admin': True,
-        }
-        return User(**udict)
-    except (KeyError, AssertionError):
+    except AssertionError:
+        logger.info('Login check failed')
         return None
-
-
-def get_user_by_key(user_key: str):
-    at = airtable.Airtable(config.key(['airtable', 'base_id']), config.key(['airtable', 'api_key']))
-    res = at.get('Test Users', filter_by_formula="FIND('%s', {Key})=1" % user_key)
-    try:
-        rec = res['records'][0]['fields']
-        udict = {
-            'email': rec['Email'],
-            'valid': rec['Valid'],
-            'username': rec['Name'],
-            'admin': True,
-        }
-        return User(**udict)
-    except (KeyError, AssertionError):
+    except Exception as e:
+        logger.exception(e)
+        logger.info('Login unexpected error')
         return None
 
 

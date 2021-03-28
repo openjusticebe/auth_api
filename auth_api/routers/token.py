@@ -9,12 +9,15 @@ from auth_api.auth import (
     auth_user,
     create_access_token,
 )
+from auth_api.repositories.users import get_user_repo
 
 router = APIRouter()
 
 
 @router.post("/token", response_model=Token, tags=["authentication"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        repo=Depends(get_user_repo)):
     """
     Submit username/password form to this endpoint to obtain auth token
 
@@ -23,7 +26,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     # FIXME: Some other auth provider then airtable would be nice
     # FIXME: Add support for scopes (like admin, moderatore, ...)
     # FIXME: Add password hashing support
-    user = auth_user(form_data.username, form_data.password)
+    user = await auth_user(form_data.username, form_data.password, repo)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

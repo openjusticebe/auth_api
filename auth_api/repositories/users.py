@@ -10,6 +10,7 @@ from ..deps import (
 GET_USER_BY_MAIL = """
     SELECT
         id_internal, name, username, email, email_valid, profession,
+        pass, salt, userid,
         access_prod, access_test, access_staging, access_dev
     FROM
         users

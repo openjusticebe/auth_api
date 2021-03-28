@@ -7,7 +7,6 @@ import uuid
 from ..auth import (
     get_current_active_user,
     decode_token,
-    get_user_by_key,
     credentials_exception,
     get_current_active_user_opt,
     generate_ukey,
