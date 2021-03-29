@@ -10,7 +10,7 @@ from ..deps import (
 GET_USER_BY_MAIL = """
     SELECT
         id_internal, name, username, email, email_valid, profession,
-        pass, salt, userid,
+        password as pass, salt, userid,
         access_prod, access_test, access_staging, access_dev
     FROM
         users
@@ -33,7 +33,7 @@ GET_USER_BY_KEY = """
 """
 
 REGISTER_NEW_USER = """
-    INSERT INTO users (userid, username, email, profession, description, ukey, pass, salt, fname, lname, interest)
+    INSERT INTO users (userid, username, email, profession, description, ukey, password, salt, fname, lname, interest)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING userid, username, email
 """
