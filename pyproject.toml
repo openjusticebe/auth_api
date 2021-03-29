@@ -13,13 +13,13 @@ uvicorn = "^0.13.4"
 PyYAML = "^5.4.1"
 asyncpg = "^0.22.0"
 toml = "^0.10.2"
-airtable = "^0.4.8"
 aiofiles = "^0.6.0"
 passlib = {extras = ["argon2"], version = "^1.7.4"}
 python-jose = "^3.2.0"
 python-multipart = "^0.0.5"
 cryptography = "^3.4.6"
 psycopg2-binary = "^2.8.6"
+Jinja2 = "^2.11.3"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.7.0"

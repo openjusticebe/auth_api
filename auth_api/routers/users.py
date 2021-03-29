@@ -4,11 +4,11 @@ from auth_api.models import (
     User,
     DecodeModel,
     ByKeyModel,
+    SubscribeModel,
 )
 from ..auth import (
     get_current_active_user,
     decode_token,
-    get_user_by_key,
     credentials_exception,
     get_current_active_user_opt,
 )
@@ -104,5 +104,4 @@ async def read_user(username: str):
     return {
         "username": username
     }
-
 

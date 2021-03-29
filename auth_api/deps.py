@@ -1,3 +1,4 @@
+import os
 import logging
 from contextlib import asynccontextmanager
 
@@ -5,6 +6,8 @@ from cryptography.fernet import Fernet
 from fastapi import Header, HTTPException
 
 from .lib_cfg import config
+from jinja2 import Environment, FileSystemLoader
+from fastapi.templating import Jinja2Templates
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.getLevelName('INFO'))
@@ -12,6 +15,10 @@ logger.addHandler(logging.StreamHandler())
 
 
 DB_POOL = False
+
+templates = Jinja2Templates(directory="templates")
+jinjaEnv = Environment(
+    loader=FileSystemLoader('%s/../templates/' % os.path.dirname(__file__)))
 
 
 def oj_decode(payload, env: str):
