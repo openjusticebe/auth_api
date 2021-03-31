@@ -7,6 +7,11 @@ This project adheres to [Semantic Versioning](http://semver.org/)
 and to the [CHANGELOG recommendations](http://keepachangelog.com/).
 ## Alpha Development
 
+### [4] - (2020-03-31)
+- Lost Password endpoint
+- Password reset endpoint
+- Some internal refactors
+
 ### [3] - (2020-03-28)
 - full postgres login
 - account creation endpoint

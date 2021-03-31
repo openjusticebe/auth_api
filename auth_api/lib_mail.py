@@ -19,6 +19,12 @@ TEMPLATE_CONFIG = {
         ['fname', 'lname'],
         False
     ),
+    'lost_password': Tpl(
+        'lost_password.html',
+        'Réinitialisation Mot de passe / Wachtwoord reset',
+        ['fname', 'lname', 'token'],
+        False
+    ),
 }
 
 

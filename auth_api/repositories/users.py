@@ -1,6 +1,7 @@
 from fastapi import Depends
 from auth_api.models import (
-    UserCreate
+    UserCreate,
+    UserData
 )
 from ..deps import (
     get_db,
@@ -9,8 +10,8 @@ from ..deps import (
 
 GET_USER_BY_MAIL = """
     SELECT
-        id_internal, name, username, email, email_valid, profession,
-        password as pass, salt, userid,
+        id_internal, name, username, email, email_valid, profession, fname, lname,
+        userid, password, salt, userid,
         access_prod, access_test, access_staging, access_dev
     FROM
         users
@@ -22,7 +23,8 @@ GET_USER_BY_MAIL = """
 
 GET_USER_BY_KEY = """
     SELECT
-        id_internal, name, username, email, email_valid, profession,
+        id_internal, name, username, email, email_valid, profession, fname, lname,
+        userid, password, salt, userid,
         access_prod, access_test, access_staging, access_dev
     FROM
         users
@@ -32,10 +34,31 @@ GET_USER_BY_KEY = """
         date_created DESC
 """
 
+GET_USER_BY_UID = """
+    SELECT
+        id_internal, name, username, email, email_valid, profession, fname, lname,
+        userid, password, salt, userid,
+        access_prod, access_test, access_staging, access_dev
+    FROM
+        users
+    WHERE
+        userid = $1
+    ORDER BY
+        date_created DESC
+"""
+
 REGISTER_NEW_USER = """
     INSERT INTO users (userid, username, email, profession, description, ukey, password, salt, fname, lname, interest)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING userid, username, email
+"""
+
+UPDATE_PASSWORD = """
+    UPDATE users SET
+        password = $1,
+        salt = $2,
+        date_updated = NOW()
+    WHERE userid = $3
 """
 
 
@@ -52,11 +75,15 @@ class UserRepo:
 
     async def getByMail(self, email):
         res = await self._db.fetchrow(GET_USER_BY_MAIL, email)
-        return res
+        return UserData(**dict(res))
 
     async def getByKey(self, ukey):
         res = await self._db.fetchrow(GET_USER_BY_KEY, ukey)
-        return res
+        return UserData(**dict(res))
+
+    async def getById(self, uid):
+        res = await self._db.fetchrow(GET_USER_BY_UID, uid)
+        return UserData(**dict(res))
 
     async def registerNewUser(self, *, user: UserCreate):
         logger.debug("Creating new user record for %s - %s", user.userid, user.username)
@@ -75,3 +102,10 @@ class UserRepo:
         logger.info("Created new user %s (%s)", user.username, user.userid)
         return res
 
+    async def updateUserPassword(self, *, user: UserData):
+        logger.debug("Updating password for user %s - %s", user.userid, user.username)
+        await self._db.execute(UPDATE_PASSWORD,
+            user.password,
+            user.salt,
+            user.userid)
+        return True

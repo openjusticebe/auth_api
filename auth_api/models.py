@@ -32,6 +32,20 @@ class User(BaseModel):
     admin: bool = True
 
 
+class UserData(BaseModel):
+    id_internal: str
+    userid: uuid.UUID
+    name: str
+    fname: Optional[str] = '[ name ]'
+    lname: Optional[str] = '[ surname ]'
+    username: str
+    email: str
+    email_valid: Optional[bool] = True
+    profession: Optional[str] = None
+    password: str
+    salt: str
+
+
 class UserInDB(User):
     hashed_password: str
 

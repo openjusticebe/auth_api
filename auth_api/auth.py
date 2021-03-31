@@ -39,12 +39,12 @@ def get_password_hash(password):
 async def auth_user(username: str, password: str, repo):
     try:
         res = await repo.getByMail(username)
-        assert verify_password(password, res['pass'], salt=res['salt'])
-        logger.info("Authentified user %s (%s)", res['username'], res['userid'])
+        assert verify_password(password, res.password, salt=res.salt)
+        logger.info("Authentified user %s (%s)", res.username, res.userid)
         udict = {
-            'email': res['email'],
+            'email': res.email,
             'valid': True,
-            'username': res['username'],
+            'username': res.username,
             'admin': True,
         }
         return User(**udict)
@@ -86,9 +86,9 @@ async def get_current_user(
     res = await repo.getByMail(tokdata.username)
 
     return User(
-        email=res['email'],
+        email=res.email,
         valid=True,
-        username=res['username'],
+        username=res.username,
         admin=True,
     )
 
@@ -115,6 +115,42 @@ def decode_token(token):
     #     logger.warning('No User Found')
     #     raise credentials_exception
     # return user
+
+
+def reset_password_token(user, expires_delta: Optional[timedelta] = None):
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+
+    payload = {
+        'id': str(user.userid),
+        'exp': expire
+    }
+
+    encoded_jwt = jwt.encode(
+        payload,
+        config.key(['auth', 'secret_key']),
+        algorithm=config.key(['auth', 'algorithm'])
+    )
+    return encoded_jwt
+
+
+def decode_reset_password_token(token):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    payload = jwt.decode(token, config.key(['auth', 'secret_key']), algorithms=[config.key(['auth', 'algorithm'])])
+    userid = payload.get("id")
+    exp = payload.get("exp")
+    epoch = datetime.fromtimestamp(exp)
+    if epoch < datetime.utcnow():
+        raise credentials_exception
+
+    return userid
 
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):

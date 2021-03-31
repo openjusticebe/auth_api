@@ -39,9 +39,9 @@ async def decode(
     res = await repo.getByMail(tokdata.username)
 
     return User(
-        email=res['email'],
+        email=res.email,
         valid=True,
-        username=res['username'],
+        username=res.username,
         admin=True,
     )
 
@@ -52,9 +52,9 @@ async def read_user_by_key(
         repo=Depends(get_user_repo)):
     res = await repo.getByKey(oj_decode(query.key, query.env))
     return User(
-        email=res['email'],
+        email=res.email,
         valid=True,
-        username=res['username'],
+        username=res.username,
         admin=True,
     )
 
@@ -92,9 +92,9 @@ async def read_user_me(
     res = await repo.getByMail(current_user.email)
 
     return User(
-        email=res['email'],
-        valid=res['email_valid'],
-        username=res['username'],
+        email=res.email,
+        valid=res.email_valid,
+        username=res.username,
         admin=True,
     )
 
