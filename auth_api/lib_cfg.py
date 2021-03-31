@@ -63,7 +63,7 @@ class ConfigClass:
         self._config = {**self._config, **cfg}
 
     def dump(self, logger):
-        logger.debug('config: %s', yaml.dump(self._config, indent=2))
+        logger.info('config: %s', yaml.dump(self._config, indent=2))
 
     def key(self, k):
         if isinstance(k, list):

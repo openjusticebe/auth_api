@@ -103,7 +103,6 @@ def main():
         config.set('log_level', 'debug')
         config.set(['server', 'log_level'], 'debug')
         logger.debug('Arguments: %s', args)
-        config.dump(logger)
 
         logger.debug('config: %s', toml.dumps(config._config))
 
@@ -112,6 +111,8 @@ def main():
             reload=True,
             **config.key('server')
         )
+
+    config.dump(logger)
 
     uvicorn.run(
         app,
