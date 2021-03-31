@@ -40,7 +40,7 @@ class ConfigClass:
         'auth': {
             'secret_key': os.getenv('AUTH_KEY', 'be62bbb060280c3955092298ab8ebbb3af0e104cd90cb969bb400e2204280ae4'),
             'algorithm': 'HS256',
-            'expiration_minutes': 30,
+            'expiration_minutes': os.getenv('TOKEN_EXPIRATION_MINUTES', 30),
         },
         'smtp': {
             'host': os.getenv('SMTP_HOST', 'localhost'),
