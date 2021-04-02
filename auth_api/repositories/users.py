@@ -25,7 +25,7 @@ GET_USER_BY_MAIL = f"""
         date_created DESC
 """
 
-GET_USER_BY_KEY = """
+GET_USER_BY_KEY = f"""
     SELECT
     {FIELDS}
     FROM
@@ -36,7 +36,7 @@ GET_USER_BY_KEY = """
         date_created DESC
 """
 
-GET_USER_BY_UID = """
+GET_USER_BY_UID = f"""
     SELECT
     {FIELDS}
     FROM
