@@ -8,11 +8,15 @@ from ..deps import (
     logger,
 )
 
-GET_USER_BY_MAIL = """
-    SELECT
+FIELDS = """
         id_internal, name, username, email, email_valid, profession, fname, lname,
         userid, password, salt, userid,
         access_prod, access_test, access_staging, access_dev
+"""
+
+GET_USER_BY_MAIL = f"""
+    SELECT
+    {FIELDS}
     FROM
         users
     WHERE
@@ -23,9 +27,7 @@ GET_USER_BY_MAIL = """
 
 GET_USER_BY_KEY = """
     SELECT
-        id_internal, name, username, email, email_valid, profession, fname, lname,
-        userid, password, salt, userid,
-        access_prod, access_test, access_staging, access_dev
+    {FIELDS}
     FROM
         users
     WHERE
@@ -36,9 +38,7 @@ GET_USER_BY_KEY = """
 
 GET_USER_BY_UID = """
     SELECT
-        id_internal, name, username, email, email_valid, profession, fname, lname,
-        userid, password, salt, userid,
-        access_prod, access_test, access_staging, access_dev
+    {FIELDS}
     FROM
         users
     WHERE

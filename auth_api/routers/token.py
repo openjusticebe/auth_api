@@ -8,6 +8,10 @@ from auth_api.models import (
 from auth_api.auth import (
     auth_user,
     create_access_token,
+    SCOPE_DEV,
+    SCOPE_STAGING,
+    SCOPE_TESTING,
+    SCOPE_PROD,
 )
 from auth_api.repositories.users import get_user_repo
 
@@ -33,8 +37,28 @@ async def login(
             detail="Bad username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    scopes = dict(x.split(':') for x in form_data.scopes)
+    payload = {
+        "sub": user.email,
+        'env': get_scope(scopes.get('host', ''))
+    }
+    print(payload)
     access_token_expires = timedelta(minutes=config.key(['auth', 'expiration_minutes']))
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data=payload, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+def get_scope(scope):
+    tests = [
+        ('127.0.0.1', SCOPE_DEV),
+        ('localhost', SCOPE_DEV),
+        ('outil.test.openjustice.be', SCOPE_STAGING),
+        ('outil.openjustice.be', SCOPE_PROD),
+    ]
+    for url, env in tests:
+        if scope.startswith(url):
+            return env
+
+    return SCOPE_DEV

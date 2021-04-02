@@ -27,6 +27,11 @@ credentials_exception = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
+SCOPE_DEV = 2
+SCOPE_STAGING = 4
+SCOPE_TESTING = 8
+SCOPE_PROD = 16
+
 
 def verify_password(plain_password, hashed_password, *, salt=''):
     return pwd_context.verify(f"{salt}{plain_password}", hashed_password)
@@ -34,6 +39,19 @@ def verify_password(plain_password, hashed_password, *, salt=''):
 
 def get_password_hash(password):
     return pwd_context.hash(password)
+
+
+def is_admin(scope, user):
+    scope = int(scope)
+    if scope == SCOPE_DEV:
+        return user.access_dev in ('moderator', 'admin', 'superadmin')
+    if scope == SCOPE_STAGING:
+        return user.access_staging in ('moderator', 'admin', 'superadmin')
+    if scope == SCOPE_TESTING:
+        return user.access_testing in ('moderator', 'admin', 'superadmin')
+    if scope == SCOPE_PROD:
+        return user.access_prod in ('moderator', 'admin', 'superadmin')
+    return False
 
 
 async def auth_user(username: str, password: str, repo):
@@ -85,11 +103,13 @@ async def get_current_user(
     tokdata = decode_token(token)
     res = await repo.getByMail(tokdata.username)
 
+    admin = is_admin(tokdata.scope, res)
+
     return User(
         email=res.email,
         valid=True,
         username=res.username,
-        admin=True,
+        admin=admin,
     )
 
 
@@ -102,10 +122,14 @@ def decode_token(token):
     try:
         payload = jwt.decode(token, config.key(['auth', 'secret_key']), algorithms=[config.key(['auth', 'algorithm'])])
         username: str = payload.get("sub")
+        scope: str = payload.get("env")
         if username is None:
             logger.warning('No User Name')
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(
+            username=username,
+            scope=scope
+        )
     except JWTError:
         logger.warning('JWTError')
         raise credentials_exception
