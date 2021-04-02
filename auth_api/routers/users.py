@@ -11,6 +11,7 @@ from ..auth import (
     decode_token,
     credentials_exception,
     get_current_active_user_opt,
+    is_admin,
 )
 from ..deps import (
     get_db,
@@ -42,7 +43,7 @@ async def decode(
         email=res.email,
         valid=True,
         username=res.username,
-        admin=True,
+        admin=is_admin(tokdata.scope, res),
     )
 
 
@@ -55,7 +56,7 @@ async def read_user_by_key(
         email=res.email,
         valid=True,
         username=res.username,
-        admin=True,
+        admin=False,
     )
 
 
@@ -95,7 +96,7 @@ async def read_user_me(
         email=res.email,
         valid=res.email_valid,
         username=res.username,
-        admin=True,
+        admin=current_user.admin,
     )
 
 

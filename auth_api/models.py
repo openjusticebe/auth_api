@@ -13,6 +13,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+    scope: Optional[str] = None
 
 
 class DecodeModel(BaseModel):
@@ -35,7 +36,6 @@ class User(BaseModel):
 class UserData(BaseModel):
     id_internal: str
     userid: uuid.UUID
-    name: str
     fname: Optional[str] = '[ name ]'
     lname: Optional[str] = '[ surname ]'
     username: str
@@ -44,6 +44,10 @@ class UserData(BaseModel):
     profession: Optional[str] = None
     password: str
     salt: str
+    access_prod: Optional[str] = 'user'
+    access_test: Optional[str] = 'user'
+    access_staging: Optional[str] = 'user'
+    access_dev: Optional[str] = 'user'
 
 
 class UserInDB(User):
