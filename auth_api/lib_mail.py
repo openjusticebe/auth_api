@@ -62,7 +62,8 @@ def send_mail(mTo, mSubject, mBody, mAttach):
 
     try:
         server = SMTP(host=config.key(['smtp', 'host']), port=config.key(['smtp', 'port']), timeout=5)
-        server.starttls()
+        # TLS Deactivated for internal mail server use
+        # server.starttls()
         server.login(mFrom, config.key(['smtp', 'password']))
         server.sendmail(mFrom, mTo, msgBody)
         server.quit()
