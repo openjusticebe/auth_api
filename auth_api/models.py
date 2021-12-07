@@ -26,6 +26,11 @@ class ByKeyModel(BaseModel):
     env: str
 
 
+class ByMailModel(BaseModel):
+    email: str
+    env: str
+
+
 class User(BaseModel):
     email: str
     valid: Optional[bool] = True

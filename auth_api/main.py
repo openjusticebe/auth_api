@@ -28,7 +28,7 @@ from .routers import (
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
-VERSION = 4
+VERSION = 5
 START_TIME = datetime.now(pytz.utc)
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
