@@ -4,6 +4,7 @@ from auth_api.models import (
     User,
     DecodeModel,
     ByKeyModel,
+    ByMailModel,
     SubscribeModel,
 )
 from ..auth import (
@@ -52,6 +53,19 @@ async def read_user_by_key(
         query: ByKeyModel,
         repo=Depends(get_user_repo)):
     res = await repo.getByKey(oj_decode(query.key, query.env))
+    return User(
+        email=res.email,
+        valid=True,
+        username=res.username,
+        admin=False,
+    )
+
+
+@router.post("/u/by/email", response_model=User, tags=["authentication"])
+async def read_user_by_email(
+        query: ByMailModel,
+        repo=Depends(get_user_repo)):
+    res = await repo.getByMail(oj_decode(query.email, query.env))
     return User(
         email=res.email,
         valid=True,
