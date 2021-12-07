@@ -7,12 +7,15 @@ This project adheres to [Semantic Versioning](http://semver.org/)
 and to the [CHANGELOG recommendations](http://keepachangelog.com/).
 ## Alpha Development
 
-### [4] - (2020-03-31)
+### [5] - (2021-12-07)
+- Adding query user by email endpoint
+
+### [4] - (2021-03-31)
 - Lost Password endpoint
 - Password reset endpoint
 - Some internal refactors
 
-### [3] - (2020-03-28)
+### [3] - (2021-03-28)
 - full postgres login
 - account creation endpoint
 - added mail notification
@@ -21,11 +24,11 @@ and to the [CHANGELOG recommendations](http://keepachangelog.com/).
 - added user records fields
 - removed airtable dependency
 
-### [2] - (2020-03-12)
+### [2] - (2021-03-12)
 - refactoring user repository
 - preparing user registration endpoint
 - switching some endpoints to postgres DB, MUCH faster
 
-### [1] - (2020-03-06)
+### [1] - (2021-03-06)
 - adding airtable / postgress migrating scripts
 - migrating user interaction and listing endpoints to database
